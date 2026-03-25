@@ -135,8 +135,8 @@ local eh_success, err = pcall(function()
 local hasJoinedDiscord = "lua kzek_DiscordJoined.txt"
 
 if not isfile(hasJoinedDiscord) then
-    local discordInvite = "https://discord.gg/mcMEkVdebJ"
-    local inviteCode = "mcMEkVdebJ"
+    local discordInvite = "https://discord.gg/kzek"
+    local inviteCode = "kzek"
     
     Library:Notify("Join our Discord for updates!", 5)
     
@@ -4480,7 +4480,7 @@ GB.Information.Right.Others:AddLabel("- đŸ™ Help me to grow the discord se
 
 GB.Information.Right.Others:AddButton({ 
     Text = "Copy Discord Invite", 
-    Func = function() setclipboard("https://discord.gg/mcMEkVdebJ") end,
+    Func = function() setclipboard("https://discord.gg/kzek") end,
     Disabled = not Support.Clipboard,
     DisabledTooltip = "Missing function: setclipboard"
 })
