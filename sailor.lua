@@ -132,7 +132,7 @@ local theChosenOne = omg[randomIndex]
 
 local eh_success, err = pcall(function()
 
-local hasJoinedDiscord = "fk kzek_DiscordJoined.txt"
+local hasJoinedDiscord = "lua kzek_DiscordJoined.txt"
 
 if not isfile(hasJoinedDiscord) then
     local discordInvite = "https://discord.gg/mcMEkVdebJ"
@@ -1085,7 +1085,7 @@ local function PostToWebhook()
         ["embeds"] = {{
             ["description"] = desc,
             ["color"] = tonumber("ffff77", 16),
-            ["footer"] = { ["text"] = string.format("fk kzek â€¢ Session: %s â€¢ %s", GetSessionTime(), os.date("%x %X")) },
+            ["footer"] = { ["text"] = string.format("lua kzek â€¢ Session: %s â€¢ %s", GetSessionTime(), os.date("%x %X")) },
             ["thumbnail"] = { ["url"] = catLink }
         }}
     }
@@ -1521,7 +1521,7 @@ local function SendSafetyWebhook(targetPlayer, reason)
                 { ["name"] = "Type", ["value"] = reason, ["inline"] = true },
                 { ["name"] = "ID", ["value"] = "```" .. game.JobId .. "```", ["inline"] = false }
             },
-            ["footer"] = { ["text"] = "fk kzek â€¢ " .. os.date("%x %X") }
+            ["footer"] = { ["text"] = "lua kzek â€¢ " .. os.date("%x %X") }
         }}
     }
 
@@ -1578,7 +1578,7 @@ local function CheckServerTypeSafety()
             end
 
             task.wait(0.8)
-            Plr:Kick("\n[fk kzek]\nReason: You are in a public server.")
+            Plr:Kick("\n[lua kzek]\nReason: You are in a public server.")
         end
     end
 end
@@ -1593,7 +1593,7 @@ local function CheckPlayerForSafety(targetPlayer)
         SendSafetyWebhook(targetPlayer, "Player Join Detection")
         
         task.wait(0.5) 
-        Plr:Kick("\n[fk kzek]\nReason: A player joined the server (" .. targetPlayer.Name .. ")")
+        Plr:Kick("\n[lua kzek]\nReason: A player joined the server (" .. targetPlayer.Name .. ")")
         return
     end
 
@@ -1603,7 +1603,7 @@ local function CheckPlayerForSafety(targetPlayer)
             SendSafetyWebhook(targetPlayer, "Moderator Detection (Rank: " .. tostring(rank) .. ")")
             
             task.wait(0.5)
-            Plr:Kick("\n[fk kzek]\nReason: Moderator Detected (" .. targetPlayer.Name .. ")")
+            Plr:Kick("\n[lua kzek]\nReason: Moderator Detected (" .. targetPlayer.Name .. ")")
         end
     end
 end
@@ -4224,7 +4224,7 @@ local function Func_ArtifactAutomation()
 end
 
 local Window = Library:CreateWindow({
-	Title = "fk kzek",
+	Title = "lua kzek",
 	Footer = "" .. assetName .. " | DUMPED | LOVE YOU",
 	NotifySide = "Right",
     Icon = tostring(theChosenOne),
@@ -5576,8 +5576,8 @@ TB_Tabs.Dungeon.T2:AddToggle("DungeonAutofarm", {
     GB.Player.Left.General:AddToggle("FPSBoost", { Text = "FPS Boost" })
     GB.Player.Left.General:AddToggle("FPSBoost_AF", { Text = "FPS Boost [Autofarm]" })
 
-    GB.Player.Left.Server:AddToggle("AntiAFK", {
-        Text = "Anti AFK",
+    GB.Player.Left.Server:AddToggle("AntiAlua", {
+        Text = "Anti Alua",
         Default = true,
         Disabled = not Support.Connections,
     })
@@ -6216,7 +6216,7 @@ task.spawn(function()
     while true do
         task.wait(60)
         
-        if Toggles.AntiAFK and Toggles.AntiAFK.Value then
+        if Toggles.AntiAlua and Toggles.AntiAlua.Value then
             pcall(function()
                 VirtualUser:CaptureController()
                 VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
