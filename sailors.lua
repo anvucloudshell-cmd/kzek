@@ -219,7 +219,6 @@ local Shared = {
     SkillTree = { Nodes = {}, Points = 0 },
     Passives = {},
     SpecStatsSlider = {},
-
     UpBlacklist = {},
 
     MerchantBusy = false,
@@ -233,7 +232,6 @@ local Shared = {
     LastWRSwitch = 0,
     LastSwitch = { Title = "", Rune = "" },
     LastBuildSwitch = 0,
-
     
     AltDamage = {},
     AltActive = false,
@@ -329,8 +327,6 @@ local Remotes = {
     Enchant = GetRemote(RS, "Remotes.EnchantAccessory"),
     Blessing = GetRemote(RS, "Remotes.BlessWeapon"),
 
-
-
     Roll_Trait = GetRemote(RS, "RemoteEvents.TraitReroll"),
     TraitAutoSkip = GetRemote(RS, "RemoteEvents.TraitUpdateAutoSkip"),
     TraitConfirm = GetRemote(RS, "RemoteEvents.TraitConfirm"),
@@ -341,7 +337,6 @@ local Remotes = {
     ConquerorHaki = GetRemote(RS, "Remotes.ConquerorHakiRemote"),
 
     TP_Portal = GetRemote(RS, "Remotes.TeleportToPortal"),
-
 
     EquipTitle = GetRemote(RS, "RemoteEvents.TitleEquip"),
     TitleUnequip = GetRemote(RS, "RemoteEvents.TitleUnequip"),
@@ -399,7 +394,6 @@ local Modules = {
     WeaponClass = GetSafeModule(RS.Modules, "WeaponClassification") or {Tools = {}},
     Fruits = GetSafeModule(RS:FindFirstChild("FruitPowerSystem") or game, "FruitPowerConfig") or {Powers = {}},
 
-
     Stats = GetSafeModule(RS.Modules, "StatRerollConfig"),
     Codes = GetSafeModule(RS, "CodesConfig") or {Codes = {}},
     ItemRarity = GetSafeModule(RS.Modules, "ItemRarityConfig"),
@@ -421,10 +415,8 @@ local function GetServiceNPC(name)
     return PATH.InteractNPCs:FindFirstChild(name)
 end
 
-local NPCs = {
     Merchant = {
         Regular = GetServiceNPC("MerchantNPC"),
-
         Valentine = GetServiceNPC("ValentineMerchantNPC"),
     }
 }
@@ -432,7 +424,6 @@ local NPCs = {
 local UI = {
     Merchant = {
         Regular = PGui:WaitForChild("MerchantUI"),
-
         Valentine = PGui:FindFirstChild("ValentineMerchantUI"),
     }
 }
@@ -460,7 +451,6 @@ local IslandCrystals = {
     ["Shibuya"] = workspace:FindFirstChild("ShibuyaStation") and workspace.ShibuyaStation:FindFirstChild("SpawnPointCrystal_Shibuya"),
     ["HuecoMundo"] = workspace:FindFirstChild("HuecoMundo") and workspace.HuecoMundo:FindFirstChild("SpawnPointCrystal_HuecoMundo"),
     ["Boss"] = workspace:FindFirstChild("BossIsland") and workspace.BossIsland:FindFirstChild("SpawnPointCrystal_Boss"),
-
     ["Shinjuku"] = workspace:FindFirstChild("ShinjukuIsland") and workspace.ShinjukuIsland:FindFirstChild("SpawnPointCrystal_Shinjuku"),
     ["Valentine"] = workspace:FindFirstChild("ValentineIsland") and workspace.ValentineIsland:FindFirstChild("SpawnPointCrystal_Valentine"),
     ["Slime"] = workspace:FindFirstChild("SlimeIsland") and workspace.SlimeIsland:FindFirstChild("SpawnPointCrystal_Slime"),
@@ -526,18 +516,15 @@ local Tables = {
     OwnedAccessory = {},
     QuestlineList = {},
 
-    OwnedItem = {},
-
     IslandList = {"Starter", "Jungle", "Desert", "Snow", "Sailor", "Shibuya", "HuecoMundo", "Boss", "Shinjuku", "Valentine", "Slime", "Academy", "Judgement", "SoulSociety"},
     NPC_QuestList = {"SlimeKeyUnlock"},
-
+    NPC_MiscList = {"Blessing", "Enchant", "SkillTree", "Cupid", "ArmHaki", "Observation", "Conqueror"},
 
     NPC_MovesetList = {},
     NPC_MasteryList = {},
 
     MobToIsland = {}
 }
-
 
 
 if Modules.TimedConfig and Modules.TimedConfig.Bosses then
@@ -2162,8 +2149,6 @@ end
 
 
 
-
-
 local function IsStrictBossMatch(npcName, targetDisplayName)
     local n = npcName:lower():gsub("%s+", "")
     local t = targetDisplayName:lower():gsub("%s+", "")
@@ -3746,8 +3731,6 @@ end
 
 
 
-
-
 local function Func_AutoMerchant()
     local MerchantUI = UI.Merchant.Regular
     local Holder = MerchantUI:FindFirstChild("Holder", true)
@@ -3989,7 +3972,6 @@ local Tabs = {
     Priority = Window:AddTab("Priority", "arrow-up-down"),
 	Main = Window:AddTab("Main", "box"),
     Automation = Window:AddTab("Automation", "repeat-2"),
-
     Player = Window:AddTab("Player", "user"),
     Teleport = Window:AddTab("Teleport", "map-pin"),
     Webhook = Window:AddTab("Webhook", "send"),
@@ -4012,7 +3994,6 @@ local GB = {
             Config = Tabs.Priority:AddLeftGroupbox("Config", "wrench"),
         },
     },
-
     Player = {
         Left = {
             General = Tabs.Player:AddLeftGroupbox("General", "user-cog"),
@@ -4058,7 +4039,6 @@ local TB = {
             NPCs = Tabs.Teleport:AddRightTabbox(),
         },
     },
-
     Misc = {
         Left = {
             Merchant = Tabs.Misc:AddLeftTabbox(),
@@ -4102,7 +4082,6 @@ local TB_Tabs = {
         T2 = TB.Automation.Right.Enchant:AddTab("Passive"),
         T3 = TB.Automation.Right.Enchant:AddTab("Config"),
     },
-
     Waypoint = {
         T1 = TB.Teleport.Left.Waypoint:AddTab("Island"),
         T2 = TB.Teleport.Left.Waypoint:AddTab("Quest"),
@@ -4114,7 +4093,6 @@ local TB_Tabs = {
     },
     Merchant = {
         T1 = TB.Misc.Left.Merchant:AddTab("Regular"),
-
         T3 = TB.Misc.Left.Merchant:AddTab("Valentine"),
     },
     Misc1 = {
@@ -4900,7 +4878,6 @@ TB_Tabs.Stats1.T3:AddToggle("AutoSkillTree", {
 })
 
 
-
 TB_Tabs.Enchant.T1:AddDropdown("SelectedEnchant", {
     Text = "Select Enchant",
     Values = Tables.OwnedAccessory,
@@ -5041,8 +5018,6 @@ local function UpdatePassiveSliders()
         end
     end
 end
-
-
 
     AddSliderToggle({ Group = GB.Player.Left.General, Id = "WS", Text = "WalkSpeed", Default = 16, Min = 16, Max = 250 })
     local TPW_T, TPW_S = AddSliderToggle({ Group = GB.Player.Left.General, Id = "TPW", Text = "TPWalk", Default = 1, Min = 1, Max = 10, Rounding = 1 })
@@ -5264,7 +5239,6 @@ TB_Tabs.Misc1.T3:AddToggle("AutoDeleteNotif", {
     Text = "Auto Hide Notification",
     Default = false,
 })
-
 
 
 TB_Tabs.Puzzle.T1:AddButton({
@@ -5903,8 +5877,6 @@ SaveManager:SetFolder("kzek/SailorPiece")
 SaveManager:BuildConfigSection(Tabs.Config)
 
 ThemeManager:ApplyToTab(Tabs.Config)
-
-
 
 UpdateNPCLists()
 UpdateAllEntities()
