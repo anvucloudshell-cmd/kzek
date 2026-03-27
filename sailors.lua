@@ -415,6 +415,7 @@ local function GetServiceNPC(name)
     return PATH.InteractNPCs:FindFirstChild(name)
 end
 
+local NPCs = {
     Merchant = {
         Regular = GetServiceNPC("MerchantNPC"),
         Valentine = GetServiceNPC("ValentineMerchantNPC"),
@@ -4019,7 +4020,7 @@ local TB = {
         },
         Right = {
             Switch = Tabs.Main:AddRightTabbox(),
-            MiscAuto = Tabs.Main.AddRightTabbox(),
+            MiscAuto = Tabs.Main:AddRightTabbox(),
         },
     },
     Automation = {
