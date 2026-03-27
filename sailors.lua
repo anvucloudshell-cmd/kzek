@@ -1672,6 +1672,14 @@ local function GetNearestIsland(targetPos, npcName)
 end
 
 local function UpdateNPCLists()
+    warn("[KZEK] Updating NPC Lists...")
+    local mobFolder = PATH.Mobs
+    if not mobFolder then
+        warn("[KZEK ERROR] NPCs Folder NOT FOUND in workspace!")
+        return
+    end
+    local children = mobFolder:GetChildren()
+    warn("[KZEK] Found " .. #children .. " objects in NPCs folder.")
     local specialMobs = {"ThiefBoss", "MonkeyBoss", "DesertBoss", "SnowBoss", "PandaMiniBoss"}
     
     local currentList = {}
@@ -1703,7 +1711,13 @@ local function UpdateNPCLists()
         end
     end
     
-    Options.SelectedMob:SetValues(Tables.MobList)
+    warn("[KZEK] MobList size before UI update: " .. #Tables.MobList)
+    if Options.SelectedMob then
+        Options.SelectedMob:SetValues(Tables.MobList)
+        warn("[KZEK] Dropdown updated.")
+    else
+        warn("[KZEK ERROR] Options.SelectedMob is MISSING!")
+    end
 end
 
 local function UpdateAllEntities()
