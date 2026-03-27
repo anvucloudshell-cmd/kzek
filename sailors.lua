@@ -930,24 +930,7 @@ if Remotes.SettingsSync then
     end)
 end
 
-Remotes.ArtifactSync.OnClientEvent:Connect(function(data)
-    Shared.ArtifactSession.Inventory = data.Inventory
-    Shared.ArtifactSession.Dust = data.Dust
-    
-    local counts = { Helmet = 0, Gloves = 0, Body = 0, Boots = 0 }
-    for _, item in pairs(data.Inventory) do
-        if counts[item.Category] ~= nil then 
-            counts[item.Category] = counts[item.Category] + 1 
-        end
-    end
 
-    -- Update your UI labels using the new table
-    if DustLabel then DustLabel:SetText("Dust: " .. CommaFormat(data.Dust)) end
-    if InvLabel_Helmet then InvLabel_Helmet:SetText("Helmet: " .. counts.Helmet .. "/500") end
-    if InvLabel_Gloves then InvLabel_Gloves:SetText("Gloves: " .. counts.Gloves .. "/500") end
-    if InvLabel_Body then InvLabel_Body:SetText("Body: " .. counts.Body .. "/500") end
-    if InvLabel_Boots then InvLabel_Boots:SetText("Boots: " .. counts.Boots .. "/500") end
-end)
 
 Remotes.TitleSync.OnClientEvent:Connect(function(data)
     if data and data.unlocked then
