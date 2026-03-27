@@ -81,9 +81,26 @@ for _, name in ipairs(LimitedExecutors) do
 end
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local function LoadWait(url)
+    local success, content = pcall(game.HttpGet, game, url)
+    if not success or not content or content:find("404") or content:find("Cloudflare") or #content < 100 then
+        warn("[KZEK ERROR] Failed to fetch: " .. url)
+        if Library and Library.Notify then
+            Library:Notify("Failed to load: " .. url, 5)
+        end
+        return function() return {} end
+    end
+    local func, err = loadstring(content)
+    if not func then
+        warn("[KZEK ERROR] Failed to compile: " .. url .. "\nError: " .. tostring(err))
+        return function() return {} end
+    end
+    return func()
+end
+
+local Library = LoadWait(repo .. "Library.lua")
+local ThemeManager = LoadWait(repo .. "addons/ThemeManager.lua")
+local SaveManager = LoadWait(repo .. "addons/SaveManager.lua")
 
 getgenv().kzek_Running = true
 
@@ -889,6 +906,7 @@ if Remotes.UpInventory then
         end
         table.sort(Tables.AllOwnedWeapons)
         if Options.SelectedPassive then Options.SelectedPassive:SetValues(Tables.AllOwnedWeapons) end
+    end
     end)
 end
 
