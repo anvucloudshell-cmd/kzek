@@ -85,17 +85,19 @@ local function LoadWait(url)
     local success, content = pcall(game.HttpGet, game, url)
     if not success or not content or content:find("404") or content:find("Cloudflare") or #content < 100 then
         warn("[KZEK ERROR] Failed to fetch: " .. url)
-        if Library and Library.Notify then
-            Library:Notify("Failed to load: " .. url, 5)
-        end
-        return function() return {} end
+        return {}
     end
     local func, err = loadstring(content)
     if not func then
         warn("[KZEK ERROR] Failed to compile: " .. url .. "\nError: " .. tostring(err))
-        return function() return {} end
+        return {}
     end
-    return func()
+    local success2, result = pcall(func)
+    if not success2 then
+        warn("[KZEK ERROR] Failed to execute: " .. url .. "\nError: " .. tostring(result))
+        return {}
+    end
+    return result
 end
 
 local Library = LoadWait(repo .. "Library.lua")
@@ -104,8 +106,8 @@ local SaveManager = LoadWait(repo .. "addons/SaveManager.lua")
 
 getgenv().kzek_Running = true
 
-local Options = Library.Options
-local Toggles = Library.Toggles
+local Options = Library.Options or {}
+local Toggles = Library.Toggles or {}
 
 Library.ForceCheckbox = true
 Library.ShowToggleFrameInKeybinds = true
