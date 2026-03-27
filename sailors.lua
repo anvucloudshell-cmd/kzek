@@ -219,11 +219,7 @@ local Shared = {
     SkillTree = { Nodes = {}, Points = 0 },
     Passives = {},
     SpecStatsSlider = {},
-    ArtifactSession = {
-        Inventory = {},
-        Dust = 0,
-        InvCount = 0
-    },
+
     UpBlacklist = {},
 
     MerchantBusy = false,
@@ -237,7 +233,7 @@ local Shared = {
     LastWRSwitch = 0,
     LastSwitch = { Title = "", Rune = "" },
     LastBuildSwitch = 0,
-    LastDungeon = 0,
+
     
     AltDamage = {},
     AltActive = false,
@@ -333,13 +329,7 @@ local Remotes = {
     Enchant = GetRemote(RS, "Remotes.EnchantAccessory"),
     Blessing = GetRemote(RS, "Remotes.BlessWeapon"),
 
-    ArtifactSync = GetRemote(RS, "RemoteEvents.ArtifactDataSync"),
-    ArtifactClaim = GetRemote(RS, "RemoteEvents.ArtifactMilestoneClaimReward"),
-    MassDelete = GetRemote(RS, "RemoteEvents.ArtifactMassDeleteByUUIDs"),
-    MassUpgrade = GetRemote(RS, "RemoteEvents.ArtifactMassUpgrade"),
-    ArtifactLock = GetRemote(RS, "RemoteEvents.ArtifactLock"),
-    ArtifactUnequip = GetRemote(RS, "RemoteEvents.ArtifactUnequip"),
-    ArtifactEquip = GetRemote(RS, "RemoteEvents.ArtifactEquip"),
+
 
     Roll_Trait = GetRemote(RS, "RemoteEvents.TraitReroll"),
     TraitAutoSkip = GetRemote(RS, "RemoteEvents.TraitUpdateAutoSkip"),
@@ -351,7 +341,7 @@ local Remotes = {
     ConquerorHaki = GetRemote(RS, "Remotes.ConquerorHakiRemote"),
 
     TP_Portal = GetRemote(RS, "Remotes.TeleportToPortal"),
-    OpenDungeon = GetRemote(RS, "Remotes.RequestDungeonPortal"),
+
 
     EquipTitle = GetRemote(RS, "RemoteEvents.TitleEquip"),
     TitleUnequip = GetRemote(RS, "RemoteEvents.TitleUnequip"),
@@ -408,7 +398,7 @@ local Modules = {
 
     WeaponClass = GetSafeModule(RS.Modules, "WeaponClassification") or {Tools = {}},
     Fruits = GetSafeModule(RS:FindFirstChild("FruitPowerSystem") or game, "FruitPowerConfig") or {Powers = {}},
-    ArtifactConfig = GetSafeModule(RS.Modules, "ArtifactConfig"),
+
 
     Stats = GetSafeModule(RS.Modules, "StatRerollConfig"),
     Codes = GetSafeModule(RS, "CodesConfig") or {Codes = {}},
@@ -434,7 +424,7 @@ end
 local NPCs = {
     Merchant = {
         Regular = GetServiceNPC("MerchantNPC"),
-        Dungeon = GetServiceNPC("DungeonMerchantNPC"),
+
         Valentine = GetServiceNPC("ValentineMerchantNPC"),
     }
 }
@@ -442,7 +432,7 @@ local NPCs = {
 local UI = {
     Merchant = {
         Regular = PGui:WaitForChild("MerchantUI"),
-        Dungeon = PGui:WaitForChild("DungeonMerchantUI"),
+
         Valentine = PGui:FindFirstChild("ValentineMerchantUI"),
     }
 }
@@ -470,7 +460,7 @@ local IslandCrystals = {
     ["Shibuya"] = workspace:FindFirstChild("ShibuyaStation") and workspace.ShibuyaStation:FindFirstChild("SpawnPointCrystal_Shibuya"),
     ["HuecoMundo"] = workspace:FindFirstChild("HuecoMundo") and workspace.HuecoMundo:FindFirstChild("SpawnPointCrystal_HuecoMundo"),
     ["Boss"] = workspace:FindFirstChild("BossIsland") and workspace.BossIsland:FindFirstChild("SpawnPointCrystal_Boss"),
-    ["Dungeon"] = workspace:FindFirstChild("Main Temple") and workspace["Main Temple"]:FindFirstChild("SpawnPointCrystal_Dungeon"),
+
     ["Shinjuku"] = workspace:FindFirstChild("ShinjukuIsland") and workspace.ShinjukuIsland:FindFirstChild("SpawnPointCrystal_Shinjuku"),
     ["Valentine"] = workspace:FindFirstChild("ValentineIsland") and workspace.ValentineIsland:FindFirstChild("SpawnPointCrystal_Valentine"),
     ["Slime"] = workspace:FindFirstChild("SlimeIsland") and workspace.SlimeIsland:FindFirstChild("SpawnPointCrystal_Slime"),
@@ -538,10 +528,9 @@ local Tables = {
 
     OwnedItem = {},
 
-    IslandList = {"Starter", "Jungle", "Desert", "Snow", "Sailor", "Shibuya", "HuecoMundo", "Boss", "Dungeon", "Shinjuku", "Valentine", "Slime", "Academy", "Judgement", "SoulSociety"},
-    NPC_QuestList = {"DungeonUnlock", "SlimeKeyUnlock"},
-    NPC_MiscList = {"Artifacts", "Blessing", "Enchant", "SkillTree", "Cupid", "ArmHaki", "Observation", "Conqueror"},
-    DungeonList = {"CidDungeon", "RuneDungeon", "DoubleDungeon", "BossRush"},
+    IslandList = {"Starter", "Jungle", "Desert", "Snow", "Sailor", "Shibuya", "HuecoMundo", "Boss", "Shinjuku", "Valentine", "Slime", "Academy", "Judgement", "SoulSociety"},
+    NPC_QuestList = {"SlimeKeyUnlock"},
+
 
     NPC_MovesetList = {},
     NPC_MasteryList = {},
@@ -549,11 +538,7 @@ local Tables = {
     MobToIsland = {}
 }
 
-local allSets = {}
-for setName, _ in pairs(Modules.ArtifactConfig.Sets) do table.insert(allSets, setName) end
 
-local allStats = {}
-for statKey, data in pairs(Modules.ArtifactConfig.Stats) do table.insert(allStats, statKey) end
 
 if Modules.TimedConfig and Modules.TimedConfig.Bosses then
     for internalName, data in pairs(Modules.TimedConfig.Bosses) do
@@ -2192,116 +2177,9 @@ local function IsMainStatGood(data, mainStatFilter)
     return mainStatFilter[data.MainStat.Stat] == true
 end
 
-local function EvaluateArtifact2(uuid, data)
-    local actions = { lock = false, delete = false, upgrade = false }
-    
-    -- Helper: Returns true if value is in filter. Returns nil if filter is empty.
-    local function GetFilterStatus(filter, value)
-        if not filter or next(filter) == nil then return nil end
-        return filter[value] == true
-    end
 
-    -- Helper: Returns true if item is allowed (Whitelist)
-    local function IsWhitelisted(filter, value)
-        local status = GetFilterStatus(filter, value)
-        if status == nil then return true end -- Empty = All allowed
-        return status
-    end
 
-    -- 1. UPGRADE LOGIC (Whitelist)
-    if Toggles.ArtifactUpgrade.Value and data.Level < Options.UpgradeLimit.Value then
-        if IsWhitelisted(Options.Up_MS.Value, data.MainStat.Stat) then
-            actions.upgrade = true
-        end
-    end
 
-    -- 2. LOCK LOGIC (Whitelist)
-    local lockMinSS = Options.Lock_MinSS.Value
-    if Toggles.ArtifactLock.Value and not data.Locked and data.Level >= (lockMinSS * 3) then
-        if IsWhitelisted(Options.Lock_MS.Value, data.MainStat.Stat) and
-           IsWhitelisted(Options.Lock_Type.Value, data.Category) and
-           IsWhitelisted(Options.Lock_Set.Value, data.Set) then
-            if GetMatches(data, Options.Lock_SS.Value) >= lockMinSS then
-                actions.lock = true
-            end
-        end
-    end
-
-    -- 3. DELETE LOGIC (Strict Intersection Blacklist)
-    if not data.Locked and not actions.lock then
-        if Toggles.DeleteUnlock.Value then
-            actions.delete = true
-        elseif Toggles.ArtifactDelete.Value then
-            
-            local typeMatch = GetFilterStatus(Options.Del_Type.Value, data.Category)
-            local setMatch = GetFilterStatus(Options.Del_Set.Value, data.Set)
-
-            -- Check type-specific Main Stat
-            local msDropdownName = "Del_MS_" .. data.Category
-            local specificMSFilter = Options[msDropdownName] and Options[msDropdownName].Value or {}
-            local msMatch = GetFilterStatus(specificMSFilter, data.MainStat.Stat)
-
-            -- DETERMINING IF ITEM IS A TARGET:
-            -- Logic: Must match active filters. If a filter is empty (nil), it is ignored.
-            local isTarget = true
-            
-            if typeMatch == false then isTarget = false end
-            if setMatch == false then isTarget = false end
-            
-            -- Safety: If NO filters are selected (nothing to target), target = false
-            if typeMatch == nil and setMatch == nil and msMatch == nil then
-                isTarget = false
-            end
-
-            if isTarget then
-                local trashCount = GetMatches(data, Options.Del_SS.Value)
-                local minTrash = Options.Del_MinSS.Value
-                local isMaxLevel = data.Level >= Options.UpgradeLimit.Value
-
-                -- Scenario A: Blacklisted Main Stat (Delete immediately)
-                if msMatch == true then
-                    actions.delete = true
-                -- Scenario B: The Gamble (Delete if reached max level but failed stats)
-                elseif minTrash == 0 then
-                    actions.delete = true -- No stat requirement set? Delete target type/set immediately.
-                elseif isMaxLevel and trashCount >= minTrash then
-                    actions.delete = true
-                end
-            end
-        end
-    end
-
-    return actions
-end
-
-local function AutoEquipArtifacts()
-    if not Toggles.ArtifactEquip.Value then return end
-    
-    local bestItems = { Helmet = nil, Gloves = nil, Body = nil, Boots = nil }
-    local bestScores = { Helmet = -1, Gloves = -1, Body = -1, Boots = -1 }
-    
-    local targetTypes = Options.Eq_Type.Value or {}
-    local targetMS = Options.Eq_MS.Value or {}
-    local targetSS = Options.Eq_SS.Value or {}
-
-    for uuid, data in pairs(Shared.ArtifactSession.Inventory) do
-        if targetTypes[data.Category] and IsMainStatGood(data, targetMS) then
-            local score = (GetMatches(data, targetSS) * 10) + data.Level
-            
-            if score > bestScores[data.Category] then
-                bestScores[data.Category] = score
-                bestItems[data.Category] = {UUID = uuid, Equipped = data.Equipped}
-            end
-        end
-    end
-
-    for category, item in pairs(bestItems) do
-        if item and not item.Equipped then
-            Remotes.ArtifactEquip:FireServer(item.UUID)
-            task.wait(0.2)
-        end
-    end
-end
 
 local function IsStrictBossMatch(npcName, targetDisplayName)
     local n = npcName:lower():gsub("%s+", "")
@@ -2585,7 +2463,6 @@ end
 
 local function UniversalPuzzleSolver(puzzleType)
     local moduleMap = {
-        ["Dungeon"] = RS.Modules:FindFirstChild("DungeonConfig"),
         ["Slime"] = RS.Modules:FindFirstChild("SlimePuzzleConfig"),
         ["Demonite"] = RS.Modules:FindFirstChild("DemoniteCoreQuestConfig"),
         ["Hogyoku"] = RS.Modules:FindFirstChild("HogyokuQuestConfig")
@@ -3884,65 +3761,9 @@ local function AutoSkillTreeLoop()
     end
 end
 
-local function Func_ArtifactMilestone()
-    local currentMilestone = 1
-    while Toggles.ArtifactMilestone.Value do
-        Remotes.ArtifactClaim:FireServer(currentMilestone)
-        
-        currentMilestone = currentMilestone + 1
-        if currentMilestone > 40 then currentMilestone = 1 end
-        
-        task.wait(1)
-    end
-end
 
-local function Func_AutoDungeon()
-    while Toggles.AutoDungeon.Value do
-        task.wait(1)
-        
-        local selected = Options.SelectedDungeon.Value
-        if not selected then continue end
 
-        if PGui.DungeonPortalJoinUI.LeaveButton.Visible then 
-            continue 
-        end
 
-        local targetIsland = "Dungeon"
-        if selected == "BossRush" then
-            targetIsland = "Sailor"
-        end
-
-        if tick() - Shared.LastDungeon > 15 then
-            Remotes.OpenDungeon:FireServer(tostring(selected))
-            Shared.LastDungeon = tick()
-            task.wait(1)
-        end
-
-        if not PGui.DungeonPortalJoinUI.LeaveButton.Visible then
-            local portal = workspace:FindFirstChild("ActiveDungeonPortal")
-
-            if not portal then
-                if Shared.Island ~= targetIsland then
-                    Remotes.TP_Portal:FireServer(targetIsland)
-                    Shared.Island = targetIsland
-                    task.wait(2.5)
-                end
-            else
-                local root = GetCharacter():FindFirstChild("HumanoidRootPart")
-                if root then
-                    root.CFrame = portal.CFrame
-                    task.wait(0.2)
-                    
-                    local prompt = portal:FindFirstChild("JoinPrompt")
-                    if prompt then
-                        fireproximityprompt(prompt)
-                        task.wait(1)
-                    end
-                end
-            end
-        end
-    end
-end
 
 local function Func_AutoMerchant()
     local MerchantUI = UI.Merchant.Regular
@@ -4166,62 +3987,7 @@ local function Func_AutoCraft()
     end
 end
 
-local function Func_ArtifactAutomation()
-    while task.wait(5) do
-        -- If inventory is empty, force a sync and wait
-        if not Shared.ArtifactSession.Inventory or not next(Shared.ArtifactSession.Inventory) then 
-            Remotes.ArtifactUnequip:FireServer("")
-            task.wait(2)
-            continue
-        end
 
-        local lockQueue = {}
-        local deleteQueue = {}
-        local upgradeQueue = {}
-
-        for uuid, data in pairs(Shared.ArtifactSession.Inventory) do
-            local res = EvaluateArtifact2(uuid, data)
-            if res.lock then table.insert(lockQueue, uuid) end
-            if res.delete then table.insert(deleteQueue, uuid) end
-            if res.upgrade then
-                local targetLvl = Options.UpgradeLimit.Value
-                if Toggles.UpgradeStage.Value then
-                    targetLvl = math.min(math.floor(data.Level / 3) * 3 + 3, Options.UpgradeLimit.Value)
-                end
-                table.insert(upgradeQueue, {["UUID"] = uuid, ["Levels"] = targetLvl})
-            end
-        end
-
-        -- Processing
-        for _, uuid in ipairs(lockQueue) do
-            Remotes.ArtifactLock:FireServer(uuid, true)
-            task.wait(0.1)
-        end
-
-        if #deleteQueue > 0 then
-            -- Chunks of 50 to prevent remote lag
-            for i = 1, #deleteQueue, 50 do
-                local chunk = {}
-                for j = i, math.min(i + 49, #deleteQueue) do table.insert(chunk, deleteQueue[j]) end
-                Remotes.MassDelete:FireServer(chunk)
-                task.wait(0.6)
-            end
-            -- Request sync after a mass delete to refresh Shared table
-            Remotes.ArtifactUnequip:FireServer("")
-        end
-
-        if #upgradeQueue > 0 then
-            for i = 1, #upgradeQueue, 50 do
-                local chunk = {}
-                for j = i, math.min(i + 49, #upgradeQueue) do table.insert(chunk, upgradeQueue[j]) end
-                Remotes.MassUpgrade:FireServer(chunk)
-                task.wait(0.6)
-            end
-        end
-
-        if Toggles.ArtifactEquip.Value then AutoEquipArtifacts() end
-    end
-end
 
 local Window = Library:CreateWindow({
 	Title = "lua kzek",
@@ -4240,8 +4006,7 @@ local Tabs = {
     Priority = Window:AddTab("Priority", "arrow-up-down"),
 	Main = Window:AddTab("Main", "box"),
     Automation = Window:AddTab("Automation", "repeat-2"),
-    Artifact = Window:AddTab("Artifact", "martini"),
-    Dungeon = Window:AddTab("Dungeon", "door-open"),
+
     Player = Window:AddTab("Player", "user"),
     Teleport = Window:AddTab("Teleport", "map-pin"),
     Webhook = Window:AddTab("Webhook", "send"),
@@ -4264,17 +4029,7 @@ local GB = {
             Config = Tabs.Priority:AddLeftGroupbox("Config", "wrench"),
         },
     },
-    Artifact = {
-        Left = {
-            Status = Tabs.Artifact:AddLeftGroupbox("Status", "info"),
-            Equip = Tabs.Artifact:AddLeftGroupbox("Auto-Equip", "kayak"),
-            Upgrade = Tabs.Artifact:AddLeftGroupbox("Upgrade", "hammer"),
-        },
-        Right = {
-            Lock = Tabs.Artifact:AddRightGroupbox("Lock", "lock"),
-            Delete = Tabs.Artifact:AddRightGroupbox("Delete", "trash"),
-        },
-    },
+
     Player = {
         Left = {
             General = Tabs.Player:AddLeftGroupbox("General", "user-cog"),
@@ -4320,14 +4075,7 @@ local TB = {
             NPCs = Tabs.Teleport:AddRightTabbox(),
         },
     },
-    Dungeon = {
-        Left = {
-            Autojoin = Tabs.Dungeon:AddLeftTabbox(),
-        },
-        Right = {
 
-        },
-    },
     Misc = {
         Left = {
             Merchant = Tabs.Misc:AddLeftTabbox(),
@@ -4371,10 +4119,7 @@ local TB_Tabs = {
         T2 = TB.Automation.Right.Enchant:AddTab("Passive"),
         T3 = TB.Automation.Right.Enchant:AddTab("Config"),
     },
-    Dungeon = {
-        T1 = TB.Dungeon.Left.Autojoin:AddTab("Autojoin"),
-        T2 = TB.Dungeon.Left.Autojoin:AddTab("Config"),
-    },
+
     Waypoint = {
         T1 = TB.Teleport.Left.Waypoint:AddTab("Island"),
         T2 = TB.Teleport.Left.Waypoint:AddTab("Quest"),
@@ -4386,7 +4131,7 @@ local TB_Tabs = {
     },
     Merchant = {
         T1 = TB.Misc.Left.Merchant:AddTab("Regular"),
-        T2 = TB.Misc.Left.Merchant:AddTab("Dungeon"),
+
         T3 = TB.Misc.Left.Merchant:AddTab("Valentine"),
     },
     Misc1 = {
@@ -5171,10 +4916,7 @@ TB_Tabs.Stats1.T3:AddToggle("AutoSkillTree", {
     Default = false,
 })
 
-TB_Tabs.Stats1.T3:AddToggle("ArtifactMilestone", {
-    Text = "Auto Artifact Milestone",
-    Default = false,
-})
+
 
 TB_Tabs.Enchant.T1:AddDropdown("SelectedEnchant", {
     Text = "Select Enchant",
@@ -5309,255 +5051,13 @@ local function UpdatePassiveSliders()
                         })
                     else
                         Options[sliderId]:SetText(label)
-                        Shared.SpecStatsSlider[sliderId]:SetVisible(true)
-                    end
-                end
-            end
-        end
-    end
-end
-
-ArtifactLabel = GB.Artifact.Left.Status:AddLabel("Status: N/A", true)
-DustLabel = GB.Artifact.Left.Status:AddLabel("Dust: N/A", true)
-
-InvLabel_Helmet = GB.Artifact.Left.Status:AddLabel("Helmet: 0/500")
-InvLabel_Gloves = GB.Artifact.Left.Status:AddLabel("Gloves: 0/500")
-InvLabel_Body = GB.Artifact.Left.Status:AddLabel("Body: 0/500")
-InvLabel_Boots = GB.Artifact.Left.Status:AddLabel("Boots: 0/500")
-
-
-GB.Artifact.Right.Lock:AddDropdown("Lock_Type", {
-    Text = "Artifact Type",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Lock:AddDropdown("Lock_Set", {
-    Text = "Artifact Set",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Lock:AddDropdown("Lock_MS", {
-    Text = "Main Stat Filter",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Lock:AddDropdown("Lock_SS", {
-    Text = "Sub Stat Filter",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Lock:AddSlider("Lock_MinSS", {
-    Text = "Min Sub-Stats",
-    Default = 0,
-    Min = 0,
-    Max = 4,
-    Rounding = 0,
-    Callback = function(a)
-        tonumber(a)
-    end
-})
-
-GB.Artifact.Right.Lock:AddToggle("ArtifactLock", {
-    Text = "Auto Lock",
-    Default = false,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_Type", {
-    Text = "Artifact Type",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_Set", {
-    Text = "Artifact Set",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_MS_Helmet", {
-    Text = "Main Stat [Helmet]",
-    Values = {"FlatDefense", "Defense"},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_MS_Gloves", {
-    Text = "Main Stat [Gloves]",
-    Values = {"Damage"},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_MS_Body", {
-    Text = "Main Stat [Body]",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_MS_Boots", {
-    Text = "Main Stat [Boots]",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddDropdown("Del_SS", {
-    Text = "Sub Stat Filter",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Right.Delete:AddSlider("Del_MinSS", {
-    Text = "Min Sub-Stats",
-    Default = 0,
-    Min = 0,
-    Max = 4,
-    Rounding = 0,
-    Callback = function(a)
-        tonumber(a)
-    end
-})
-
-GB.Artifact.Right.Delete:AddToggle("ArtifactDelete", {
-    Text = "Auto Delete",
-    Default = false,
-})
-
-GB.Artifact.Right.Delete:AddToggle("DeleteUnlock", {
-    Text = "Auto Delete Unlocked",
-    Default = false,
-})
-
-GB.Artifact.Left.Upgrade:AddSlider("UpgradeLimit", {
-    Text = "Upgrade Limit",
-    Default = 0,
-    Min = 0,
-    Max = 15,
-    Rounding = 0,
-    Callback = function(a)
-        tonumber(a)
-    end
-})
-
-GB.Artifact.Left.Upgrade:AddDropdown("Up_MS", {
-    Text = "Main Stat Filter",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Left.Upgrade:AddToggle("ArtifactUpgrade", {
-    Text = "Auto Upgrade",
-    Default = false,
-})
-
-GB.Artifact.Left.Upgrade:AddToggle("UpgradeStage", {
-    Text = "Upgrade in Stages",
-    Default = false,
-})
-
-GB.Artifact.Left.Equip:AddDropdown("Eq_Type", {
-    Text = "Artifact Type",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Left.Equip:AddDropdown("Eq_MS", {
-    Text = "Main Stat Filter",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Left.Equip:AddDropdown("Eq_SS", {
-    Text = "Sub Stat Filter",
-    Values = {},
-    Default = nil,
-    Multi = true,
-    Searchable = true,
-})
-
-GB.Artifact.Left.Equip:AddToggle("ArtifactEquip", {
-    Text = "Auto Equip",
-    Default = false,
-})
-
-Tabs.Artifact:UpdateWarningBox({
-    Title = "â ï¸ WARNING â ï¸",
-    Text = "These features below are in heavy development. Use at your own risk. I am NOT responsible for any resulting artifacts or issues.",
+                        Shared.SpecStatsSlider[sliderId]:SetViible for any resulting artifacts or issues.",
     IsNormal = false,
     Visible = true,
     LockSize = true,
 })
 
-TB_Tabs.Dungeon.T1:AddLabel("BossRush Supported.", true)
 
-TB_Tabs.Dungeon.T1:AddDropdown("SelectedDungeon", {
-    Text = "Select Dungeon",
-    Values = Tables.DungeonList,
-    Default = nil,
-    Multi = false,
-    AllowNull = true,
-    Searchable = true,
-})
-
-TB_Tabs.Dungeon.T1:AddToggle("AutoDungeon", {
-    Text = "Auto Join Dungeon",
-    Default = false,
-})
-
-DungeonCount = TB_Tabs.Dungeon.T2:AddLabel("Dungeon Completed: N/A")
-
-TB_Tabs.Dungeon.T2:AddDropdown("SelectedDiff", {
-    Text = "Select Difficulty",
-    Values = {"Easy", "Medium", "Hard", "Extreme"},
-    Default = nil,
-    Multi = false,
-    AllowNull = true,
-    Searchable = true,
-})
-
-TB_Tabs.Dungeon.T2:AddToggle("AutoDiff", {
-    Text = "Auto Select Difficulty",
-    Default = false,
-})
-
-TB_Tabs.Dungeon.T2:AddToggle("AutoReplay", {
-    Text = "Auto Replay",
-    Default = false,
-})
-
-TB_Tabs.Dungeon.T2:AddToggle("DungeonAutofarm", {
-    Text = "Autofarm Dungeon",
-    Default = false,
-})
 
     AddSliderToggle({ Group = GB.Player.Left.General, Id = "WS", Text = "WalkSpeed", Default = 16, Min = 16, Max = 250 })
     local TPW_T, TPW_S = AddSliderToggle({ Group = GB.Player.Left.General, Id = "TPW", Text = "TPWalk", Default = 1, Min = 1, Max = 10, Rounding = 1 })
@@ -5781,18 +5281,7 @@ TB_Tabs.Misc1.T3:AddToggle("AutoDeleteNotif", {
     Default = false,
 })
 
-TB_Tabs.Puzzle.T1:AddButton({
-    Text = "Complete Dungeon Puzzle",
-    Disabled = not Support.Proximity,
-    Func = function()
-        local currentLevel = Plr.Data.Level.Value
-        if currentLevel >= 5000 then
-            UniversalPuzzleSolver("Dungeon")
-        else
-            Library:Notify("Level 5000 required! Current: " .. currentLevel, 3)
-        end
-    end
-})
+
 
 TB_Tabs.Puzzle.T1:AddButton({
     Text = "Complete Slime Key Puzzle",
@@ -5997,30 +5486,12 @@ Toggles.AutoSkillTree:OnChanged(function(state)
     Thread("AutoSkillTree", SafeLoop("Skill Tree", AutoSkillTreeLoop), state)
 end)
 
-Toggles.ArtifactMilestone:OnChanged(function(state)
-    Thread("ArtifactMilestone", Func_ArtifactMilestone, state)
-end)
-
 Toggles.AutoEnchant:OnChanged(function(s) Thread("AutoEnchant", SafeLoop("Enchant", function() AutoUpgradeLoop("Enchant") end), s) end)
 Toggles.AutoEnchantAll:OnChanged(function(s) Thread("AutoEnchantAll", SafeLoop("EnchantAll", function() AutoUpgradeLoop("Enchant") end), s) end)
 Toggles.AutoBlessing:OnChanged(function(s) Thread("AutoBlessing", SafeLoop("Blessing", function() AutoUpgradeLoop("Blessing") end), s) end)
 Toggles.AutoBlessingAll:OnChanged(function(s) Thread("AutoBlessingAll", SafeLoop("BlessingAll", function() AutoUpgradeLoop("Blessing") end), s) end)
 
-Toggles.ArtifactLock:OnChanged(function(state)
-    Thread("Artifact.Lock", SafeLoop("ArtifactLogic", Func_ArtifactAutomation), state)
-end)
 
-Toggles.ArtifactDelete:OnChanged(function(state)
-    Thread("Artifact.Delete", SafeLoop("ArtifactLogic", Func_ArtifactAutomation), state)
-end)
-
-Toggles.ArtifactUpgrade:OnChanged(function(state)
-    Thread("Artifact.Upgrade", SafeLoop("ArtifactLogic", Func_ArtifactAutomation), state)
-end)
-
-Toggles.AutoDungeon:OnChanged(function(state)
-    Thread("AutoDungeon", Func_AutoDungeon, state)
-end)
 
 Toggles.AutoMerchant:OnChanged(function(state)
     Thread("AutoMerchant", SafeLoop("Merchant", Func_AutoMerchant), state)
@@ -6449,22 +5920,7 @@ SaveManager:BuildConfigSection(Tabs.Config)
 
 ThemeManager:ApplyToTab(Tabs.Config)
 
-Options.Lock_Type:SetValues(Modules.ArtifactConfig.Categories)
-Options.Lock_Set:SetValues(allSets)
-Options.Lock_MS:SetValues(allStats)
-Options.Lock_SS:SetValues(allStats)
 
-Options.Del_Type:SetValues(Modules.ArtifactConfig.Categories)
-Options.Del_Set:SetValues(allSets)
-Options.Del_MS_Body:SetValues(allStats)
-Options.Del_MS_Boots:SetValues(allStats)
-Options.Del_SS:SetValues(allStats)
-
-Options.Up_MS:SetValues(allStats)
-
-Options.Eq_Type:SetValues(Modules.ArtifactConfig.Categories)
-Options.Eq_MS:SetValues(allStats)
-Options.Eq_SS:SetValues(allStats)
 
 UpdateNPCLists()
 UpdateAllEntities()
