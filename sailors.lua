@@ -2,6 +2,7 @@ if getgenv().kzek_Running then
     warn("Script already running!")
     return
 end
+warn("[KZEK] Script Starting...")
 
 repeat task.wait() until game:IsLoaded()
 repeat task.wait() until game.GameId ~= 0
@@ -807,7 +808,8 @@ local function GetFormattedItemSections(itemSourceTable, isNewItems)
     return result
 end
 
-Remotes.UpInventory.OnClientEvent:Connect(function(category, data)
+if Remotes.UpInventory then
+    Remotes.UpInventory.OnClientEvent:Connect(function(category, data)
     Shared.InventorySynced = true
     if category == "Items" then 
         Shared.Cached.Inv = data or {}
@@ -887,8 +889,8 @@ Remotes.UpInventory.OnClientEvent:Connect(function(category, data)
         end
         table.sort(Tables.AllOwnedWeapons)
         if Options.SelectedPassive then Options.SelectedPassive:SetValues(Tables.AllOwnedWeapons) end
-    end
-end)
+    end)
+end
 
 RS.Remotes.NotifyItemDrop.OnClientEvent:Connect(function(data)
     if not data or type(data) ~= "table" or not data.name then return end
@@ -898,19 +900,23 @@ RS.Remotes.NotifyItemDrop.OnClientEvent:Connect(function(data)
     NewItemsBuffer[name] = (NewItemsBuffer[name] or 0) + qty
 end)
 
-Remotes.StockUpdate.OnClientEvent:Connect(function(itemName, stockLeft)
+if Remotes.StockUpdate then
+    Remotes.StockUpdate.OnClientEvent:Connect(function(itemName, stockLeft)
     Shared.CurrentStock[itemName] = tonumber(stockLeft)
     if stockLeft == 0 then
         Library:Notify("[MERCHANT] Bought: " .. tostring(itemName), 2)
     end
 end)
+end
 
-Remotes.UpSkillTree.OnClientEvent:Connect(function(data)
+if Remotes.UpSkillTree then
+    Remotes.UpSkillTree.OnClientEvent:Connect(function(data)
     if data then
         Shared.SkillTree.Nodes = data.Nodes or {}
         Shared.SkillTree.SkillPoints = data.SkillPoints or 0
     end
 end)
+end
 
 if Remotes.SettingsSync then
     Remotes.SettingsSync.OnClientEvent:Connect(function(data)
@@ -920,13 +926,16 @@ end
 
 
 
-Remotes.TitleSync.OnClientEvent:Connect(function(data)
+if Remotes.TitleSync then
+    Remotes.TitleSync.OnClientEvent:Connect(function(data)
     if data and data.unlocked then
         Tables.UnlockedTitle = data.unlocked
     end
 end)
+end
 
-Remotes.HakiStateUpdate.OnClientEvent:Connect(function(arg1, arg2)
+if Remotes.HakiStateUpdate then
+    Remotes.HakiStateUpdate.OnClientEvent:Connect(function(arg1, arg2)
     if arg1 == false then
         Shared.ArmHaki = false
         return
@@ -936,6 +945,7 @@ Remotes.HakiStateUpdate.OnClientEvent:Connect(function(arg1, arg2)
         Shared.ArmHaki = arg2
     end
 end)
+end
 
 if Remotes.BossUIUpdate then
     Remotes.BossUIUpdate.OnClientEvent:Connect(function(mode, data)
@@ -949,9 +959,11 @@ if Remotes.BossUIUpdate then
     end)
 end
 
-Remotes.TradeUpdated.OnClientEvent:Connect(function(data)
-    Shared.TradeState = data
-end)
+if Remotes.TradeUpdated then
+    Remotes.TradeUpdated.OnClientEvent:Connect(function(data)
+        Shared.TradeState = data
+    end)
+end
 
 PATH.Mobs.ChildRemoved:Connect(function(child)
     if child:IsA("Model") and child.Name:lower():find("boss") then
