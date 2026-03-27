@@ -2713,7 +2713,7 @@ local function AutoQuestlineLoop()
                 end
 
             elseif taskType:find("Piece") or taskType:find("Found") then
-                local pType = taskType:find("Dungeon") and "Dungeon" or (taskType:find("Slime") and "Slime" or "Demonite" or "Hogyoku")
+                local pType = (taskType:find("Slime") and "Slime" or "Demonite" or "Hogyoku")
                 UniversalPuzzleSolver(pType)
 
             elseif taskType:find("Has") and taskType:find("Race") then
@@ -5051,11 +5051,13 @@ local function UpdatePassiveSliders()
                         })
                     else
                         Options[sliderId]:SetText(label)
-                        Shared.SpecStatsSlider[sliderId]:SetViible for any resulting artifacts or issues.",
-    IsNormal = false,
-    Visible = true,
-    LockSize = true,
-})
+                        Shared.SpecStatsSlider[sliderId]:SetVisible(true)
+                    end
+                end
+            end
+        end
+    end
+end
 
 
 
@@ -5135,7 +5137,6 @@ TB_Tabs.Waypoint.T2:AddDropdown("SelectedQuestNPC", {
     Callback = function(a)
 
     local questMap = {
-        ["DungeonUnlock"] = "DungeonPortalsNPC",
         ["SlimeKeyUnlock"] = "SlimeCraftNPC"
     }
 
@@ -5344,7 +5345,7 @@ TB_Tabs.Puzzle.T1:AddButton({
 })
 
 TB_Tabs.Puzzle.T2:AddLabel({
-    Text = "- â ï¸: Experimental feature. Deep testing required!\n- â ï¸: Make sure to store your race & clan before using this.\n- Dungeon tasks only make you join dungeon.\n- Feature will change some other features settings.\n- Report any bugs on discord server!",
+    Text = "- â ï¸: Experimental feature. Deep testing required!\n- â ï¸: Make sure to store your race & clan before using this.\n- Feature will change some other features settings.\n- Report any bugs on discord server!",
     DoesWrap = true,
 })
 
